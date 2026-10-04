@@ -4,6 +4,7 @@ using InfoPanel.Services;
 using InfoPanel.TuringPanel;
 using InfoPanel.ThermalrightPanel;
 using InfoPanel.ThermaltakePanel;
+using InfoPanel.LogitechGamePanel;
 using InfoPanel.ViewModels;
 using InfoPanel.Views.Windows;
 using LibUsbDotNet;
@@ -640,4 +641,83 @@ public partial class UsbPanelsPage : Page
         }
     }
 
+    // === Logitech Panel ===
+
+    private async void ButtonDiscoverLogitechGamePanelDevices_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button)
+        {
+            button.IsEnabled = false;
+            await UpdateLogitechGamePanelDeviceList();
+            button.IsEnabled = true;
+            Logger.Information("LogitechGamePanel Discovery: finished List Update");
+        }
+    }
+
+    private Task UpdateLogitechGamePanelDeviceList()
+    {
+        var discoveredDevices = LogitechGamePanelHelper.ScanDevices();
+
+        Logger.Information("LogitechGamePanel Discovery: Found {Count} devices", discoveredDevices.Count);
+        foreach (var discoveredDevice in discoveredDevices)
+        {
+            ConfigModel.Instance.AccessSettings(settings =>
+            {
+                var device = settings.LogitechGamePanelDevices.FirstOrDefault(d =>
+                    d.IsMatching(discoveredDevice.DeviceId, discoveredDevice.DeviceLocation, discoveredDevice.Model));
+
+                if (device == null)
+                {
+                    var newDevice = new LogitechGamePanelDevice()
+                    {
+                        DeviceId = discoveredDevice.DeviceId,
+                        DeviceLocation = discoveredDevice.DeviceLocation,
+                        Model = discoveredDevice.Model,
+                        ProfileGuid = ConfigModel.Instance.Profiles.FirstOrDefault()?.Guid ?? Guid.Empty
+                    };
+
+                    if (discoveredDevice.ModelInfo != null)
+                    {
+                        newDevice.RuntimeProperties.Name = discoveredDevice.ModelInfo.Name;
+                    }
+
+                    settings.LogitechGamePanelDevices.Add(newDevice);
+                    Logger.Information("LogitechGamePanel Discovery: Added new device '{DeviceId}'", discoveredDevice.DeviceId);
+                }
+                else
+                {
+                    device.DeviceLocation = discoveredDevice.DeviceLocation;
+
+                    if (device.ModelInfo != null)
+                    {
+                        device.RuntimeProperties.Name = device.ModelInfo.Name;
+                    }
+
+                    Logger.Information("LogitechGamePanel Discovery: Device '{DeviceId}' already exists", discoveredDevice.DeviceId);
+                }
+            });
+        }
+        
+        return Task.CompletedTask;
+    }
+
+    private void ButtonRemoveLogitechGamePanelDevice_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is LogitechGamePanelDevice runtimeDevice)
+        {
+            ConfigModel.Instance.AccessSettings(settings =>
+            {
+                var deviceConfig = settings.LogitechGamePanelDevices.FirstOrDefault(c => c.Id == runtimeDevice.Id);
+                if (deviceConfig != null)
+                {
+                    if (LogitechGamePanelTask.Instance.IsDeviceRunning(deviceConfig.Id))
+                    {
+                        _ = LogitechGamePanelTask.Instance.StopDevice(deviceConfig.Id);
+                    }
+                    
+                    settings.LogitechGamePanelDevices.Remove(deviceConfig);
+                }
+            });
+        }
+    }
 }

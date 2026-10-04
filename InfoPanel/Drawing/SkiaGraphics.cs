@@ -287,8 +287,15 @@ namespace InfoPanel.Drawing
                 adjustedX = x - tb.MeasuredWidth;
             else if (width > 0 && centerAlign)
                 adjustedX = x;
+            
+            // No font AA for Logitech display
+            var options = new TextPaintOptions()
+            {
+                //Edging = SKFontEdging.Alias
+            };
 
             tb.Paint(Canvas, new SKPoint(adjustedX, y));
+            //tb.Paint(Canvas, new SKPoint(adjustedX, y), options);
         }
 
         private static readonly ConcurrentDictionary<string, SKTypeface> _typefaceCache = [];

@@ -502,8 +502,19 @@ namespace InfoPanel
                     await ThermaltakePanelTask.Instance.StopAsync();
                 }
             }
+            else if (e.PropertyName == nameof(Settings.LogitechGamePanelMultiDeviceMode))
+            {
+                if (Settings.LogitechGamePanelMultiDeviceMode)
+                {
+                    await LogitechGamePanelTask.Instance.StartAsync();
+                }
+                else
+                {
+                    await LogitechGamePanelTask.Instance.StopAsync();
+                }
+            }
 
-            await SaveSettingsAsync();
+                await SaveSettingsAsync();
         }
 
         public List<Profile> GetProfilesCopy()
@@ -711,6 +722,15 @@ namespace InfoPanel
                             foreach (var device in settings.ThermaltakePanelDevices)
                             {
                                 Settings.ThermaltakePanelDevices.Add(device);
+                            }
+
+                            // Load LogitechGamePanel settings
+                            Settings.LogitechGamePanelMultiDeviceMode = settings.LogitechGamePanelMultiDeviceMode;
+
+                            Settings.LogitechGamePanelDevices.Clear();
+                            foreach (var device in settings.LogitechGamePanelDevices)
+                            {
+                                Settings.LogitechGamePanelDevices.Add(device);
                             }
 
                             // Load hotkey bindings

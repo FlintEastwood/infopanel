@@ -92,7 +92,18 @@ namespace InfoPanel.Models
 
         [ObservableProperty]
         private bool _thermaltakePanelMultiDeviceMode = false;
-
+		
+		//Logitech
+        private readonly ObservableCollection<LogitechGamePanelDevice> _logitechGamePanelDevices = [];
+		
+        public ObservableCollection<LogitechGamePanelDevice> LogitechGamePanelDevices
+        {
+            get { return _logitechGamePanelDevices; }
+        }
+        [ObservableProperty]
+        private bool _logitechGamePanelMultiDeviceMode = false;
+        //Logitech end
+		
         private readonly ObservableCollection<HotkeyBinding> _hotkeyBindings = [];
 
         public ObservableCollection<HotkeyBinding> HotkeyBindings
@@ -140,6 +151,7 @@ namespace InfoPanel.Models
             TuringPanelDevices.CollectionChanged += TuringPanelDevices_CollectionChanged;
             ThermalrightPanelDevices.CollectionChanged += ThermalrightPanelDevices_CollectionChanged;
             ThermaltakePanelDevices.CollectionChanged += ThermaltakePanelDevices_CollectionChanged;
+            LogitechGamePanelDevices.CollectionChanged += LogitechGamePanelDevices_CollectionChanged;
         }
 
         private void BeadaPanelDevices_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -232,6 +244,27 @@ namespace InfoPanel.Models
         {
             if (e.PropertyName != nameof(ThermaltakePanelDevice.RuntimeProperties))
                 OnPropertyChanged(nameof(ThermaltakePanelDevices));
+        }
+
+        private void LogitechGamePanelDevices_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (LogitechGamePanelDevice device in e.OldItems)
+                    device.PropertyChanged -= LogitechGamePanelDevice_PropertyChanged;
+            }
+            if (e.NewItems != null)
+            {
+                foreach (LogitechGamePanelDevice device in e.NewItems)
+                    device.PropertyChanged += LogitechGamePanelDevice_PropertyChanged;
+            }
+            OnPropertyChanged(nameof(LogitechGamePanelDevices));
+        }
+
+        private void LogitechGamePanelDevice_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(LogitechGamePanelDevice.RuntimeProperties))
+                OnPropertyChanged(nameof(LogitechGamePanelDevices));
         }
 
     }

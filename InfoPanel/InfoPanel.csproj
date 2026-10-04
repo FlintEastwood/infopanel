@@ -96,6 +96,9 @@
 		<Reference Include="LcdDriver.TrofeoVision">
 			<HintPath>Lib\LcdDriver.TrofeoVision.dll</HintPath>
 		</Reference>
+		<Reference Include="LogitechLcdEnginesWrapper">
+			<HintPath>Lib\LogitechLcdEnginesWrapper.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -110,6 +113,7 @@
 		<None Remove="Effects\DeeperColor.ps" />
 		<None Remove="hwinfo_logo_white.png" />
 		<None Remove="index.html" />
+		<None Remove="Lib\LogitechLcdEnginesWrapper.dll" />
 		<None Remove="Logo.png" />
 		<None Remove="logo_white.png" />
 		<None Remove="Resources\Images\home.jpg" />
@@ -157,6 +161,9 @@
 	<ItemGroup>
 		<Resource Include="Effects\DeeperColor.fx" />
 		<Resource Include="Effects\DeeperColor.ps" />
+		<Resource Include="Lib\LogitechLcdEnginesWrapper.dll">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Resource>
 		<Resource Include="Resources\Images\favicon.ico">
 			<CopyToOutputDirectory></CopyToOutputDirectory>
 		</Resource>
@@ -276,6 +283,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Resources.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Properties\Settings.Designer.cs">
+		  <DesignTimeSharedInput>True</DesignTimeSharedInput>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
 		<Compile Update="Views\Components\Chart\DonutProperties.xaml.cs">
 		  <SubType>Code</SubType>
 		</Compile>
@@ -366,6 +378,10 @@
 		</None>
 		<None Update="NunitoSans_7pt_Condensed-SemiBoldItalic.ttf">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="Properties\Settings.settings">
+		  <Generator>SettingsSingleFileGenerator</Generator>
+		  <LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
 	</ItemGroup>
 
